@@ -65,7 +65,7 @@ activitiesField.addEventListener('change', e => {
         // the 'toggleOtherCheckboxes' function
             // accepts a boolean as an argument
             // disables/enables other chekbox inputs with the same day and time attribute
-    const toggleOtherCheckboxes = (bool) => {
+    const toggleOtherCheckboxes = bool => {
         for(let i=0; i<otherCheckboxes.length;i++){
             if( activityDateAndTime === otherCheckboxes[i].getAttribute('data-day-and-time') ){
                 otherCheckboxes[i].disabled = bool;
@@ -115,5 +115,78 @@ paymentDropdown.addEventListener('change', e => {
         } else {
             paymentMethods[i].hidden = true;
         }
+    }
+});
+
+// Form validation
+const form = document.querySelector('form');
+const emailInput = document.querySelector('#email');
+const creditCardNumber = document.querySelector('#cc-num');
+const zip = document.querySelector('#zip');
+const cvv = document.querySelector('#cvv');
+
+    // the 'nameValidator' helper function 
+        // checks that the name field isn't blank or empty, or contain symbols or numbers
+        // returns a boolean, 'nameIsValid'
+const nameValidator = () => {
+    const nameValue = nameInput.value;
+    const nameIsValid = /^[a-zA-Z]+ ?[a-zA-Z]*? ?[a-zA-Z]*?$/.test(nameValue);
+    return nameIsValid;
+}
+
+    // the 'emailValidator' helper function 
+        // checks that the email is formatted like an email, with a non-@ symbol, followed by an @, followed by a domain name.
+        // returns a boolean, 'emailIsValid'
+const emailValidator = () => {
+    const emailValue = emailInput.value;
+    const emailIsValid = /^[^@]+@[^@.]+\.[a-z]+$/i.test(emailValue);
+    return emailIsValid;
+}
+
+    // the 'activityValidator' helper function 
+        // checks that at least one activity has been selected (i.e. totalCost > 0)
+        // returns a boolean, 'activitySelectionIsValid'
+const activityValidator = () => {
+    const activitySelectionIsValid = totalCost > 0;
+    return activitySelectionIsValid;
+}
+
+    // the 'creditCardValidator' helper function 
+        // checks that the "Card number" isa number between 13 and 15 digits, no dashes or spaces
+        // checks the "Zip code" is a 5-digit number
+        // checks the "CVV" is a 3-digit number
+        // returns a boolean, true when all three validation criteria are met, false otherwise
+const creditCardValidator = () => {
+    const ccNumValue = creditCardNumber.value;
+    const ccNumIsValid = /^\d{13,16}$/.test(ccNumValue);
+    const zipValue = zip.value;
+    const zipIsValid = /^\d{5}$/.test(zipValue);
+    const cvvValue = cvv.value;
+    const cvvIsValid = /^\d{3}$/.test(cvvValue);
+    return ccNumIsValid && zipIsValid && cvvIsValid;
+}
+    // on pressing the "Register" button, the form will get validated by calling the helper functions
+        // 'nameValidator', 'emailValidator', and 'activityValidator' must all be true for the form to submit
+        // if credit card is the selected payment method, then 'creditCardValidator' must also be true for the form to submit
+        // console will log out messages whenever a helper function returns false
+form.addEventListener('submit', e => {
+    if( !nameValidator() ){
+        e.preventDefault();
+        console.log('name is evaluating to false');
+    }
+    
+    if( !emailValidator() ){
+        e.preventDefault();
+        console.log('email is evaluating to false');
+    }
+      
+    if( !activityValidator() ){
+        e.preventDefault();
+        console.log('language amount is lower than one');
+    }
+
+    if( !creditCardDiv.hidden && !creditCardValidator() ){
+        e.preventDefault();
+        console.log('issues with credit card values')
     }
 });
