@@ -86,3 +86,34 @@ activitiesField.addEventListener('change', e => {
         // the 'totalCost' is injected into the page
     activityCostShown.innerHTML = `Total: $${totalCost}`;
 });
+
+// "Payment Info" section
+const paymentDropdown = document.querySelector('#payment');
+const creditCardOption = paymentDropdown.children[1];
+const creditCardDiv = document.querySelector('#credit-card');
+const paypalDiv = document.querySelector('#paypal');
+const bitcoinDiv = document.querySelector('#bitcoin');
+
+
+    // On page load, the default "Payment" option is credit card, on the dropdown, other payment method elements are hidden
+creditCardOption.setAttribute('selected', '');
+paypalDiv.hidden = true;
+bitcoinDiv.hidden = true;
+
+    // The page responds to the "Payment" dropdown, making selected elements visible and hidding the other options.
+paymentDropdown.addEventListener('change', e => {
+    const option = e.target.value;
+    const paymentMethods = [
+        creditCardDiv,
+        paypalDiv,
+        bitcoinDiv
+    ];
+
+    for(let i=0; i<paymentMethods.length; i++){
+        if(option === paymentMethods[i].className){
+            paymentMethods[i].hidden = false;
+        } else {
+            paymentMethods[i].hidden = true;
+        }
+    }
+});
