@@ -49,3 +49,40 @@ designDropdown.addEventListener('change', e => {
         }
     }
 });
+
+// "Register for Activities" section
+const activitiesField = document.querySelector('#activities');
+const activityCostShown = document.querySelector('#activities-cost');
+let totalCost = 0;
+
+    // the "Register for Activities" fieldset adjusts the "Total: $" element based on the the user's choice of activities
+activitiesField.addEventListener('change', e => {
+    const isChecked = e.target.checked;
+    const activityCost = +e.target.getAttribute('data-cost');
+    const activityDateAndTime = e.target.getAttribute('data-day-and-time');
+    const otherCheckboxes = document.querySelectorAll(`#activities-box input:not([name=${e.target.getAttribute('name')}])`);
+
+        // the 'toggleOtherCheckboxes' function
+            // accepts a boolean as an argument
+            // disables/enables other chekbox inputs with the same day and time attribute
+    const toggleOtherCheckboxes = (bool) => {
+        for(let i=0; i<otherCheckboxes.length;i++){
+            if( activityDateAndTime === otherCheckboxes[i].getAttribute('data-day-and-time') ){
+                otherCheckboxes[i].disabled = bool;
+            }
+        }
+    }
+
+        // on a checkbox click, the cost attribute is added to the 'totalCost' and checkboxes for activities on the same time and date are disabled
+            // if a checkbox is unclicked, the cost is substracted from the total and previously disabled checkboxes are re-enabled
+    if(isChecked){
+        totalCost += activityCost;
+        toggleOtherCheckboxes(true);
+    } else {
+        totalCost -= activityCost;
+        toggleOtherCheckboxes(false);
+    }
+
+        // the 'totalCost' is injected into the page
+    activityCostShown.innerHTML = `Total: $${totalCost}`;
+});
