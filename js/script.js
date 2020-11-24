@@ -125,13 +125,22 @@ const creditCardNumber = document.querySelector('#cc-num');
 const zip = document.querySelector('#zip');
 const cvv = document.querySelector('#cvv');
 
-    // the 'nameValidator' helper function 
-        // checks that the name field isn't blank or empty, or contain symbols or numbers
-        // returns a boolean, 'nameIsValid'
-const nameValidator = () => {
+    // the 'nameIsBlank' helper function 
+        // checks whether the name field is blank or empty
+        // returns a boolean, 'nameIsBlank'
+const nameIsBlank = () => {
     const nameValue = nameInput.value;
-    const nameIsValid = /^[a-zA-Z]+ ?[a-zA-Z]*? ?[a-zA-Z]*?$/.test(nameValue);
-    return nameIsValid;
+    const nameIsBlank = /^$|\s+/.test(nameValue);
+    return nameIsBlank;
+}
+
+    // the 'nameHasSymbolsOrNumbers' helper function 
+            // checks whether the name field contains symbols or numbers
+            // returns a boolean, 'nameHasSymbolsOrNumbers'
+const nameHasSymbolsOrNumbers = () => {
+    const nameValue = nameInput.value;
+    const nameHasSymbolsOrNumbers = /[^a-zA-z\s]/.test(nameValue);
+    return nameHasSymbolsOrNumbers;
 }
 
     // the 'emailValidator' helper function 
@@ -151,42 +160,125 @@ const activityValidator = () => {
     return activitySelectionIsValid;
 }
 
-    // the 'creditCardValidator' helper function 
+    // the 'ccNumValidator' helper function 
         // checks that the "Card number" isa number between 13 and 15 digits, no dashes or spaces
-        // checks the "Zip code" is a 5-digit number
-        // checks the "CVV" is a 3-digit number
-        // returns a boolean, true when all three validation criteria are met, false otherwise
-const creditCardValidator = () => {
+        // returns a boolean, 'ccNumIsValid'
+const ccNumValidator = () => {
     const ccNumValue = creditCardNumber.value;
     const ccNumIsValid = /^\d{13,16}$/.test(ccNumValue);
+    return ccNumIsValid;
+}
+    // the 'zipValidator' helper function 
+        // checks the "Zip code" is a 5-digit number
+        // returns a boolean, 'zipIsValid'
+const zipValidator = () => {
     const zipValue = zip.value;
     const zipIsValid = /^\d{5}$/.test(zipValue);
+    return zipIsValid;
+}
+
+    // the 'cvvValidator' helper function 
+        // checks the "CVV" is a 3-digit number
+        // returns a boolean, 'cvvIsValid'
+const cvvValidator = () => {
     const cvvValue = cvv.value;
     const cvvIsValid = /^\d{3}$/.test(cvvValue);
-    return ccNumIsValid && zipIsValid && cvvIsValid;
+    return cvvIsValid;
 }
+
+    // extra credit - real time validation for email input
+emailInput.addEventListener('keyup', () => {
+    if( !emailValidator() ){
+        applyValidationErrors(emailInput.parentNode);
+    } else {
+        removeValidationErrors(emailInput.parentNode);
+    }
+});
+
     // on pressing the "Register" button, the form will get validated by calling the helper functions
         // 'nameValidator', 'emailValidator', and 'activityValidator' must all be true for the form to submit
-        // if credit card is the selected payment method, then 'creditCardValidator' must also be true for the form to submit
-        // console will log out messages whenever a helper function returns false
+        // if credit card is the selected payment method, then 'ccNumValidator', 'zipValidator', and 'cvvValidator' must also be true for the form to submit
+        // calls to 'applyValidationErrors()' and 'removeValidationErrors()' are made when the validations return false and true, respectively
 form.addEventListener('submit', e => {
-    if( !nameValidator() ){
+        // extra credit - conditional error messages for name input
+    if( nameIsBlank() ){
+        document.querySelector('#name-hint').innerHTML = 'Name field cannot be blank';
         e.preventDefault();
-        console.log('name is evaluating to false');
+        applyValidationErrors(nameInput.parentNode);
+    } else if ( nameHasSymbolsOrNumbers() ) {
+        document.querySelector('#name-hint').innerHTML = 'Name field cannot have symbols or numbers';
+        e.preventDefault();
+        applyValidationErrors(nameInput.parentNode);
+    } else {
+        removeValidationErrors(nameInput.parentNode)
     }
-    
+
     if( !emailValidator() ){
         e.preventDefault();
-        console.log('email is evaluating to false');
+        applyValidationErrors(emailInput.parentNode);
+    } else {
+        removeValidationErrors(emailInput.parentNode);
     }
       
     if( !activityValidator() ){
         e.preventDefault();
-        console.log('language amount is lower than one');
+        applyValidationErrors(activitiesField);
+    } else {
+        removeValidationErrors(activitiesField);
     }
 
-    if( !creditCardDiv.hidden && !creditCardValidator() ){
-        e.preventDefault();
-        console.log('issues with credit card values')
+    if( !creditCardDiv.hidden ) {
+        if ( !ccNumValidator() ){
+            e.preventDefault();
+            applyValidationErrors(creditCardNumber.parentNode);
+        } else {
+            removeValidationErrors(creditCardNumber.parentNode);
+        }
+        if ( !zipValidator() ){
+            e.preventDefault();
+            applyValidationErrors(zip.parentNode);
+        } else {
+            removeValidationErrors(zip.parentNode);
+        }
+        if ( !cvvValidator() ){
+            e.preventDefault();
+            applyValidationErrors(cvv.parentNode);
+        } else {
+            removeValidationErrors(cvv.parentNode);
+        }
     }
 });
+
+// Accessibility 
+const checkboxes = document.querySelectorAll('#activities-box input');
+        // The checkboxes in the "Register for Activities" section listen for focus and blur events
+for(let i=0; i<checkboxes.length; i++){
+            // On focus, the parent label of the focused checkbox get a '.focus' class added for better visibility
+    checkboxes[i].addEventListener('focus', () => {
+        checkboxes[i].parentNode.classList.add('focus');
+    });
+            // On blur, the parent label of the unfocused checkbox goes back to normal
+    checkboxes[i].addEventListener('blur', () => {
+        checkboxes[i].parentNode.classList.remove('focus');
+    });
+}
+
+    // The following functions apply/remove validation errors as style classes and properties
+        // the 'applyValidationErrors' helper function
+            // Takes an element as an argument, usually the parent element of the input where the error occured
+            // Applies a '.not-valid' class and removes a 'valid' class, if any
+            // Displays the validation error
+const applyValidationErrors = element => {
+    element.classList.add('not-valid');
+    element.classList.remove('valid');
+    element.lastElementChild.style.display = 'inherit';
+}
+        // the 'removeValidationErrors' helper function
+            // Takes an element as an argument, usually the parent element of the input where the error occured
+            // Applies a '.valid' class and removes a '.not-valid' class, if any
+            // Hides the validation error
+const removeValidationErrors = element => {
+    element.classList.add('valid');
+    element.classList.remove('not-valid');
+    element.lastElementChild.style.display = 'none';
+}
