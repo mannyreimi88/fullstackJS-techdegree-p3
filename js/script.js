@@ -130,7 +130,7 @@ const cvv = document.querySelector('#cvv');
         // returns a boolean, 'nameIsBlank'
 const nameIsBlank = () => {
     const nameValue = nameInput.value;
-    const nameIsBlank = /^$|\s+/.test(nameValue);
+    const nameIsBlank = /^\s*$/.test(nameValue);
     return nameIsBlank;
 }
 
@@ -148,7 +148,7 @@ const nameHasSymbolsOrNumbers = () => {
         // returns a boolean, 'emailIsValid'
 const emailValidator = () => {
     const emailValue = emailInput.value;
-    const emailIsValid = /^[^@]+@[^@.]+\.[a-z]+$/i.test(emailValue);
+    const emailIsValid = /^[^@]+@[^@.]+\.[a-z]{2,}$/i.test(emailValue);
     return emailIsValid;
 }
 
